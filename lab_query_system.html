@@ -1,0 +1,216 @@
+<artifact id="lab-test-query-system" type="text/html" language="html" title="检验项目移动端查询系统"><!DOCTYPE html>
+
+<html lang="zh-CN"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>检验项目查询系统</title> <style> * { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+background-color: #f5f5f5;
+overflow-x: hidden;
+}
+
+.header {
+background: linear-gradient(135deg, #1e90ff 0%, #1c7fd9 100%);
+color: white;
+padding: 20px;
+text-align: center;
+box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+position: sticky;
+top: 0;
+z-index: 100;
+}
+
+.header h1 {
+font-size: 24px;
+margin-bottom: 15px;
+font-weight: 600;
+}
+
+.search-box {
+display: flex;
+gap: 10px;
+margin-bottom: 15px;
+}
+
+.search-input {
+flex: 1;
+padding: 12px 15px;
+border: none;
+border-radius: 25px;
+font-size: 14px;
+outline: none;
+transition: box-shadow 0.3s;
+}
+
+.search-input:focus {
+box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.search-btn {
+background: white;
+border: none;
+padding: 12px 20px;
+border-radius: 25px;
+cursor: pointer;
+font-weight: 600;
+color: #1e90ff;
+transition: transform 0.2s;
+}
+
+.search-btn:active {
+transform: scale(0.95);
+}
+
+.filter-tabs {
+display: flex;
+gap: 10px;
+overflow-x: auto;
+padding-bottom: 10px;
+padding-left: 20px;
+padding-right: 20px;
+}
+
+.filter-tab {
+background: white;
+border: 1px solid #ddd;
+padding: 8px 15px;
+border-radius: 20px;
+font-size: 13px;
+white-space: nowrap;
+cursor: pointer;
+transition: all 0.3s;
+}
+
+.filter-tab.active {
+background: #1e90ff;
+color: white;
+border-color: #1e90ff;
+}
+
+.container {
+padding: 20px;
+max-width: 600px;
+margin: 0 auto;
+}
+
+.result-item {
+background: white;
+border-radius: 12px;
+padding: 18px;
+margin-bottom: 15px;
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+transition: all 0.3s;
+}
+
+.result-item:active {
+transform: translateY(-2px);
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.item-header {
+display: flex;
+align-items: center;
+gap: 12px;
+margin-bottom: 15px;
+}
+
+.item-icon {
+width: 40px;
+height: 40px;
+border-radius: 8px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 20px;
+background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+}
+
+.item-title {
+font-size: 16px;
+font-weight: 600;
+color: #333;
+flex: 1;
+}
+
+.info-row {
+display: flex;
+align-items: flex-start;
+gap: 12px;
+margin-bottom: 10px;
+font-size: 13px;
+}
+
+.info-label {
+color: #666;
+min-width: 80px;
+font-weight: 500;
+}
+
+.info-value {
+color: #333;
+flex: 1;
+word-break: break-word;
+}
+
+.empty-state {
+text-align: center;
+padding: 60px 20px;
+color: #999;
+}
+
+.empty-icon {
+font-size: 48px;
+margin-bottom: 15px;
+}
+
+.loading {
+text-align: center;
+padding: 30px;
+color: #666;
+}
+
+.badge {
+display: inline-block;
+background: #f0f0f0;
+padding: 3px 10px;
+border-radius: 12px;
+font-size: 12px;
+color: #666;
+margin-right: 5px;
+margin-bottom: 5px;
+}
+
+.badge.urgent {
+background: #ffe3e3;
+color: #d63031;
+}
+
+.highlight {
+background-color: #fff3cd;
+padding: 2px 4px;
+border-radius: 3px;
+}
+
+@media (max-width: 480px) {
+.header h1 {
+font-size: 20px;
+}
+
+.container {
+padding: 15px;
+}
+
+.result-item {
+padding: 15px;
+margin-bottom: 12px;
+}
+
+.info-row {
+font-size: 12px;
+}
+
+.info-label {
+min-width: 70px;
+}
+}
+</style>
+
+</head> <body> <div class="header"> <h1>🧬 检验项目查询系统</h1> <div class="search-box"> <input type="text" class="search-input" id="searchInput" placeholder="输入检验项目或关键词..." > <button class="search-btn" id="searchBtn">搜索</button> </div> <div class="filter-tabs" id="filterTabs"></div> </div> <div class="container"> <div id="results"></div> </div> <script> // 完整的检验项目数据库（基于汇总.xlsx） const labTests = [ { name: "尿液干化学分析", category: "体液", specimen: "尿液", container: "一次性尿沉渣管", amount: "12ml", minAmount: "5ml", preparation: "随机尿，中段尿为宜；以清晨第一次尿为宜；自然饮食", notes: "1. 以清晨第一次尿为宜；自然饮食，不宜大量饮水；2. 孕妇糖耐量筛查者应在服用糖水前留取尿液；3. 女性应避免白带及经血污染", turnaroundTime: "30min", transport: "室温", deliveryTime: "<1h" }, { name: "血常规五分类", category: "血液", specimen: "全血", container: "EDTA-K2抗凝管（紫色）", amount: "2ml", minAmount: "1ml", preparation: "充分颠倒混匀,防止凝固", notes: "充分颠倒混匀,防止凝固", turnaroundTime: "30min", transport: "室温", deliveryTime: "<2h" }, { name: "C反应蛋白 (CRP)", category: "血液", specimen: "全血", container: "EDTA-K2抗凝管（紫色）", amount: "2ml", minAmount: "1ml", preparation: "充分颠倒混匀,防止凝固", notes: "充分颠倒混匀,防止凝固", turnaroundTime: "45min", transport: "室温", deliveryTime: "<2h" }, { name: "血清蛋白电泳", category: "生化", specimen: "血清", container: "含分离胶采血管（黄色）", amount: "1ml", minAmount: "1ml", preparation: "平静", notes: "每周二、四测，周三、五取报告", turnaroundTime: "12:00-17:00", transport: "室温", deliveryTime: "<2h" }, { name: "葡萄糖测定", category: "生化", specimen: "血清", container: "含分离胶采血管（黄色）", amount: "2ml", minAmount: "1ml", preparation: "空腹：至少禁食8h，以12h～14h为宜，不宜超过16h。宜安排在上午7:00～9:00采血", notes: "离心后2~8℃保存3天有效", turnaroundTime: "11点前送检，17点后取", transport: "室温", deliveryTime: "立即送检" }, { name: "血清前白蛋白", category: "生化", specimen: "血清", container: "含分离胶采血管（黄色）", amount: "3ml", minAmount: "2ml", preparation: "空腹", notes: "2~8℃保存3天", turnaroundTime: "11点前送检，17点后取", transport: "室温", deliveryTime: "<2小时（急诊需立即送检）" }, { name: "总蛋白", category: "生化", specimen: "血清", container: "含分离胶采血管（黄色）", amount: "3ml", minAmount: "2ml", preparation: "空腹", notes: "2~8℃保存7天", turnaroundTime: "11点前送检，17点后取", transport: "室温", deliveryTime: "<2小时（急诊需立即送检）" }, { name: "白蛋白", category: "生化", specimen: "血清", container: "含分离胶采血管（黄色）", amount: "3ml", minAmount: "2ml", preparation: "空腹", notes: "2~8℃保存7天", turnaroundTime: "11点前送检，17点后取", transport: "室温", deliveryTime: "<2小时（急诊需立即送检）" }, { name: "白细胞介素Ⅵ", category: "血液", specimen: "全血", container: "EDTA抗凝静脉管（紫色）", amount: "2ml", minAmount: "不适用", preparation: "充分颠倒混匀,防止凝固", notes: "充分颠倒混匀,防止凝固", turnaroundTime: "1h", transport: "室温", deliveryTime: "<2h" }, { name: "新冠核酸检测", category: "分子生物", specimen: "咽拭子/鼻拭子", container: "病毒采样管（短绿/长红）", amount: "见采集要求", minAmount: "不适用", preparation: "见采集手册", notes: "8点前收到的标本当天17点可取报告", turnaroundTime: "根据流行情况", transport: "室温", deliveryTime: "<2h" }, { name: "乙肝二对半（定性）", category: "免疫", specimen: "血清", container: "含分离胶采血管（黄色）", amount: "3ml", minAmount: "1.5ml", preparation: "无特殊要求", notes: "不能使用热灭活样本、严重溶血或污染样本", turnaroundTime: "第二个工作日15:30后取", transport: "室温", deliveryTime: "<4h" }, { name: "粪便常规", category: "体液", specimen: "粪便", container: "一次性大便容器", amount: "至少1～5g（指头大小）", minAmount: "不适用", preparation: "正常饮食", notes: "1. 标本应取自粪便的不同部位特别是病理性改变；2. 检查貲虫需要用软黏透明纸拭子；3. 不可用纸尿裤等吸水性材料", turnaroundTime: "30min", transport: "室温", deliveryTime: "<1h" }, { name: "脑脊液常规检查", category: "体液", specimen: "脑脊液", container: "无菌管", amount: "每管1-2毫升", minAmount: "0.5ml", preparation: "由临床医师进行腰椎穿刺采集", notes: "分别收集于3个无菌试管中：第一管作化学分析，第二管作细菌培养，第三管作一般性状及显微镜检查", turnaroundTime: "30min", transport: "室温", deliveryTime: "立即送检" }, { name: "阴道分泌物常规", category: "体液", specimen: "阴道分泌物", container: "一次性白带管", amount: "取膀胱截石位采集", minAmount: "不适用", preparation: "取样品前24小时应禁止性交、盆浴、阴道灌洗及局部上药；避免经期影响", notes: "取膀胱截石位，将窥器放入阴道内，暴露子宫颈，以干棉签于阴道上1/3侧壁刮取分泌物", turnaroundTime: "1小时后", transport: "室温", deliveryTime: "<1h" }, { name: "D-二聚体", category: "血液", specimen: "全血", container: "109mmol/L柠檬酸钠抗凝管（蓝色）", amount: "1.8ml（准确至采血管刻度2ml）", minAmount: "不适用", preparation: "充分颠倒混匀,防止凝固", notes: "充分颠倒混匀,防止凝固", turnaroundTime: "常规：2h；急诊：1h", transport: "室温", deliveryTime: "<1h" }, { name: "PCT降钙素原定量检测", category: "血液", specimen: "血清", container: "含分离胶采血管（黄色）", amount: "3ml", minAmount: "1ml", preparation: "离心取上清", notes: "8小时内有效", turnaroundTime: "1h", transport: "室温", deliveryTime: "<2h" } ]; let allTests = [...labTests]; let filteredTests = [...labTests]; // 获取所有分类 const categories = [...new Set(labTests.map(test => test.category))]; // 初始化过滤标签 function initFilterTabs() { const tabsContainer = document.getElementById('filterTabs'); // 添加"全部"标签 const allTab = document.createElement('div'); allTab.className = 'filter-tab active'; allTab.textContent = '全部'; allTab.onclick = () => { document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active')); allTab.classList.add('active'); filteredTests = [...allTests]; displayResults(); }; tabsContainer.appendChild(allTab); // 添加分类标签 categories.forEach(category => { const tab = document.createElement('div'); tab.className = 'filter-tab'; tab.textContent = category; tab.onclick = () => { document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active')); tab.classList.add('active'); filteredTests = allTests.filter(test => test.category === category); displayResults(); }; tabsContainer.appendChild(tab); }); } // 高亮搜索关键词 function highlightKeyword(text, keyword) { if (!keyword) return text; const regex = new RegExp(`(${keyword})`, 'gi'); return text.replace(regex, '<span class="highlight">$1</span>'); } // 显示结果 function displayResults() { const resultsContainer = document.getElementById('results'); if (filteredTests.length === 0) { resultsContainer.innerHTML = ` <div class="empty-state"> <div class="empty-icon">🔍</div> <div>未找到相关检验项目</div> <div style="font-size: 12px; margin-top: 10px; color: #bbb;"> 请尝试其他关键词或选择不同分类 </div> </div> `; return; } const searchKeyword = document.getElementById('searchInput').value.toLowerCase(); resultsContainer.innerHTML = filteredTests.map(test => ` <div class="result-item"> <div class="item-header"> <div class="item-icon">🧫</div> <div class="item-title">${highlightKeyword(test.name, searchKeyword)}</div> <div class="badge">${test.category}</div> </div> <div class="info-row"> <span class="info-label">🩸 标本类型</span> <span class="info-value">${test.specimen}</span> </div> <div class="info-row"> <span class="info-label">🧪 容器</span> <span class="info-value">${test.container}</span> </div> <div class="info-row"> <span class="info-label">📏 标本量</span> <span class="info-value">${test.amount}</span> </div> <div class="info-row"> <span class="info-label">👤 患者准备</span> <span class="info-value">${test.preparation}</span> </div> <div class="info-row"> <span class="info-label">🚚 运送要求</span> <span class="info-value">${test.transport}</span> </div> <div class="info-row"> <span class="info-label">⏱️ 送检时限</span> <span class="info-value">${test.deliveryTime}</span> </div> <div class="info-row"> <span class="info-label">📋 说明</span> <span class="info-value">${test.notes}</span> </div> </div> `).join(''); } // 搜索功能 function search() { const keyword = document.getElementById('searchInput').value.toLowerCase(); const activeTab = document.querySelector('.filter-tab.active').textContent; if (activeTab === '全部') { filteredTests = allTests.filter(test => test.name.toLowerCase().includes(keyword) || test.specimen.toLowerCase().includes(keyword) || test.container.toLowerCase().includes(keyword) || test.notes.toLowerCase().includes(keyword) ); } else { filteredTests = allTests.filter(test => test.category === activeTab && ( test.name.toLowerCase().includes(keyword) || test.specimen.toLowerCase().includes(keyword) || test.container.toLowerCase().includes(keyword) || test.notes.toLowerCase().includes(keyword) ) ); } displayResults(); } // 事件监听 document.getElementById('searchBtn').addEventListener('click', search); document.getElementById('searchInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') search(); }); // 初始化 initFilterTabs(); displayResults(); // 禁用右键菜单（可选） document.addEventListener('contextmenu', (e) => { // e.preventDefault(); // 如果需要禁用右键，取消注释 }); </script> </body> </html></artifact>
